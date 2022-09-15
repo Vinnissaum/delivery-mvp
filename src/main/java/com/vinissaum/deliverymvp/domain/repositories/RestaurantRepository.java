@@ -9,7 +9,7 @@ public interface RestaurantRepository {
     List<Restaurant> findAll();
     Restaurant find(Long id);
     Restaurant insert(Restaurant restaurant);
-    Restaurant update(Restaurant kitchen);
+    Restaurant update(Restaurant restaurant);
     void delete(Restaurant restaurant);
 
 }

@@ -17,47 +17,54 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vinissaum.deliverymvp.domain.exceptions.EntityInUseException;
+import com.vinissaum.deliverymvp.domain.exceptions.ResourceNotFoundException;
 import com.vinissaum.deliverymvp.domain.model.Kitchen;
-import com.vinissaum.deliverymvp.domain.repositories.KitchenRepository;
+import com.vinissaum.deliverymvp.domain.services.KitchenService;
 
 @RestController
 @RequestMapping(value = "/kitchens", produces = MediaType.APPLICATION_JSON_VALUE)
 public class KitchenController {
 
     @Autowired
-    KitchenRepository repository;
+    KitchenService service;
 
     @GetMapping
     public List<Kitchen> index() {
-        return repository.findAll();
+        return service.findAll();
     }
 
     @GetMapping("/{id}")
     public Kitchen show(@PathVariable Long id) {
-        return repository.find(id);
+        return service.find(id);
     }
 
     @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping
     public Kitchen store(@RequestBody Kitchen kitchen) {
 
-        return repository.insert(kitchen);
+        return service.insert(kitchen);
     }
 
     @PutMapping("/{id}")
     public Kitchen update(@PathVariable Long id, @RequestBody Kitchen kitchen) {
-        Kitchen entity = repository.find(id);
+        Kitchen entity = service.find(id);
 
         BeanUtils.copyProperties(kitchen, entity, "id");
-        entity = repository.update(entity);
+        entity = service.update(entity);
 
         return entity;
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        Kitchen entity = repository.find(id);
-        repository.delete(entity);
+    public ResponseEntity<Kitchen> delete(@PathVariable Long id) {
+        try {
+            service.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (EntityInUseException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 }

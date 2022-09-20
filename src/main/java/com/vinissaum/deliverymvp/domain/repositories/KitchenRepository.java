@@ -10,6 +10,6 @@ public interface KitchenRepository {
     Kitchen find(Long id);
     Kitchen insert(Kitchen kitchen);
     Kitchen update(Kitchen kitchen);
-    void delete(Kitchen kitchen);
+    void delete(Long id);
 
 }

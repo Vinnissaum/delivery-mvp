@@ -40,8 +40,8 @@ public class StateRepositoryImpl implements StateRepository {
 
     @Transactional
     @Override
-    public void delete(State entity) {
-        State obj = find(entity.getId());
+    public void delete(Long id) {
+        State obj = find(id);
         manager.remove(obj);
     }
 }

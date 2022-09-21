@@ -10,6 +10,6 @@ public interface RestaurantRepository {
     Restaurant find(Long id);
     Restaurant insert(Restaurant restaurant);
     Restaurant update(Restaurant restaurant);
-    void delete(Restaurant restaurant);
+    void delete(Long id);
 
 }

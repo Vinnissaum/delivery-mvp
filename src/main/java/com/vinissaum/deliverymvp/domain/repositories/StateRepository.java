@@ -10,6 +10,6 @@ public interface StateRepository {
     State find(Long id);
     State insert(State state);
     State update(State state);
-    void delete(State state);
+    void delete(Long id);
 
 }

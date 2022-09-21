@@ -37,7 +37,8 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     }
 
     @Transactional
-    public void delete(Restaurant restaurant) {
+    public void delete(Long id) {
+        Restaurant restaurant = manager.find(Restaurant.class, id);
         manager.remove(restaurant);
     }
 

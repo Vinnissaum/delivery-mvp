@@ -20,52 +20,52 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.vinissaum.deliverymvp.domain.exceptions.EntityInUseException;
 import com.vinissaum.deliverymvp.domain.exceptions.ResourceNotFoundException;
-import com.vinissaum.deliverymvp.domain.model.Kitchen;
-import com.vinissaum.deliverymvp.domain.services.KitchenService;
+import com.vinissaum.deliverymvp.domain.model.Restaurant;
+import com.vinissaum.deliverymvp.domain.services.RestaurantService;
 
 @RestController
 @RequestMapping(value = "/kitchens", produces = MediaType.APPLICATION_JSON_VALUE)
-public class KitchenController {
+public class RestaurantController {
 
     @Autowired
-    KitchenService service;
+    RestaurantService service;
 
     @GetMapping
-    public ResponseEntity<List<Kitchen>> index() {
-        List<Kitchen> list = service.findAll();
+    public ResponseEntity<List<Restaurant>> index() {
+        List<Restaurant> list = service.findAll();
 
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Kitchen> show(@PathVariable Long id) {
-        Kitchen entity = service.find(id);
+    public ResponseEntity<Restaurant> show(@PathVariable Long id) {
+        Restaurant entity = service.find(id);
 
         return ResponseEntity.ok(entity);
     }
 
     @PostMapping
-    public ResponseEntity<Kitchen> store(@RequestBody Kitchen kitchen) {
-        Kitchen entity = service.insert(kitchen);
+    public ResponseEntity<Restaurant> store(@RequestBody Restaurant restaurant) {
+        Restaurant entity = service.insert(restaurant);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-        .buildAndExpand(kitchen.getId()).toUri();
+        .buildAndExpand(restaurant.getId()).toUri();
 
         return ResponseEntity.created(location).body(entity);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Kitchen> update(@PathVariable Long id, @RequestBody Kitchen kitchen) {
-        Kitchen entity = service.find(id);
+    public ResponseEntity<Restaurant> update(@PathVariable Long id, @RequestBody Restaurant restaurant) {
+        Restaurant entity = service.find(id);
 
-        BeanUtils.copyProperties(kitchen, entity, "id");
+        BeanUtils.copyProperties(restaurant, entity, "id");
         entity = service.update(entity);
 
         return ResponseEntity.ok(entity);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Kitchen> delete(@PathVariable Long id) {
+    public ResponseEntity<Restaurant> delete(@PathVariable Long id) {
         try {
             service.delete(id);
             return ResponseEntity.noContent().build();

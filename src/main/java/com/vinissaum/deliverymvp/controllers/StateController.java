@@ -1,10 +1,12 @@
 package com.vinissaum.deliverymvp.controllers;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,50 +14,64 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.vinissaum.deliverymvp.domain.exceptions.EntityInUseException;
+import com.vinissaum.deliverymvp.domain.exceptions.ResourceNotFoundException;
 import com.vinissaum.deliverymvp.domain.model.State;
-import com.vinissaum.deliverymvp.domain.repositories.StateRepository;
+import com.vinissaum.deliverymvp.domain.services.StateService;
 
 @RestController
 @RequestMapping("/states")
 public class StateController {
 
     @Autowired
-    private StateRepository repository;
+    private StateService service;
 
     @GetMapping
-    public List<State> index() {
-        return repository.findAll();
+    public ResponseEntity<List<State>> index() {
+        List<State> list = service.findAll();
+
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
-    public State show(@PathVariable Long id) {
-        return repository.find(id);
+    public ResponseEntity<State> show(@PathVariable Long id) {
+        State entity = service.find(id);
+
+        return ResponseEntity.ok(entity);
     }
 
-    @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping
-    public State store(@RequestBody State state) {
+    public ResponseEntity<State> store(@RequestBody State state) {
+        State entity = service.insert(state);
 
-        return repository.insert(state);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+        .buildAndExpand(state.getId()).toUri();
+
+        return ResponseEntity.created(location).body(entity);
     }
 
     @PutMapping("/{id}")
-    public State update(@PathVariable Long id, @RequestBody State state) {
-        State entity = repository.find(id);
+    public ResponseEntity<State> update(@PathVariable Long id, @RequestBody State state) {
+        State entity = service.find(id);
 
         BeanUtils.copyProperties(state, entity, "id");
-        entity = repository.update(entity);
+        entity = service.update(entity);
 
-        return entity;
+        return ResponseEntity.ok(entity);
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        State entity = repository.find(id);
-        repository.delete(entity);
+    public ResponseEntity<State> delete(@PathVariable Long id) {
+        try {
+            service.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (EntityInUseException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 }

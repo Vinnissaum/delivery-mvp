@@ -10,6 +10,6 @@ public interface CityRepository {
     City find(Long id);
     City insert(City city);
     City update(City city);
-    void delete(City city);
+    void delete(Long id);
 
 }

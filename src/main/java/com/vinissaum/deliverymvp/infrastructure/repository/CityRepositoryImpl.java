@@ -40,8 +40,8 @@ public class CityRepositoryImpl implements CityRepository {
 
     @Transactional
     @Override
-    public void delete(City entity) {
-        City obj = find(entity.getId());
+    public void delete(Long id) {
+        City obj = find(id);
         manager.remove(obj);
     }
 }

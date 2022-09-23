@@ -3,7 +3,6 @@ package com.vinissaum.deliverymvp.controllers;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,7 +23,7 @@ import com.vinissaum.deliverymvp.domain.model.Restaurant;
 import com.vinissaum.deliverymvp.domain.services.RestaurantService;
 
 @RestController
-@RequestMapping(value = "/kitchens", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RestaurantController {
 
     @Autowired
@@ -45,23 +44,28 @@ public class RestaurantController {
     }
 
     @PostMapping
-    public ResponseEntity<Restaurant> store(@RequestBody Restaurant restaurant) {
-        Restaurant entity = service.insert(restaurant);
+    public ResponseEntity<?> store(@RequestBody Restaurant restaurant) {
+        try {
+            Restaurant entity = service.insert(restaurant);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-        .buildAndExpand(restaurant.getId()).toUri();
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+            .buildAndExpand(restaurant.getId()).toUri();
 
-        return ResponseEntity.created(location).body(entity);
+            return ResponseEntity.created(location).body(entity);
+        } catch(ResourceNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Restaurant> update(@PathVariable Long id, @RequestBody Restaurant restaurant) {
-        Restaurant entity = service.find(id);
+        try {
+            Restaurant entity = service.update(id, restaurant);
 
-        BeanUtils.copyProperties(restaurant, entity, "id");
-        entity = service.update(entity);
-
-        return ResponseEntity.ok(entity);
+            return ResponseEntity.ok(entity);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")

@@ -2,6 +2,7 @@ package com.vinissaum.deliverymvp.controllers;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -61,6 +63,17 @@ public class RestaurantController {
     public ResponseEntity<Restaurant> update(@PathVariable Long id, @RequestBody Restaurant restaurant) {
         try {
             Restaurant entity = service.update(id, restaurant);
+
+            return ResponseEntity.ok(entity);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Restaurant> partialUpdate(@PathVariable Long id, @RequestBody Map<String, Object> attributes) {
+        try {
+            Restaurant entity = service.partialUpdate(id, attributes);
 
             return ResponseEntity.ok(entity);
         } catch (ResourceNotFoundException e) {

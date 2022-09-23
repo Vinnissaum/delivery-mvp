@@ -1,13 +1,17 @@
 package com.vinissaum.deliverymvp.domain.services;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vinissaum.deliverymvp.domain.exceptions.EntityInUseException;
 import com.vinissaum.deliverymvp.domain.exceptions.ResourceNotFoundException;
 import com.vinissaum.deliverymvp.domain.model.Kitchen;
@@ -54,6 +58,17 @@ public class RestaurantService {
         return repository.update(restaurantExists);
     }
 
+    public Restaurant partialUpdate(Long id, Map<String, Object> attributesToUpdate) {
+        Restaurant restaurantExists = repository.find(id);
+
+        if (restaurantExists == null) {
+            throw new ResourceNotFoundException(String.format("Restaurant id: %d not found", id));
+        }
+        merge(restaurantExists, attributesToUpdate);
+
+        return repository.update(restaurantExists);
+    }
+
     public void delete(Long id) {
         try {
             repository.delete(id);
@@ -63,5 +78,19 @@ public class RestaurantService {
         catch (DataIntegrityViolationException e) {
             throw new EntityInUseException(String.format("Kitchen id: %d can not be removed", id));
         }
+    }
+
+    private void merge(Restaurant entity, Map<String, Object> attributes) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Restaurant updatedRestaurant = objectMapper.convertValue(attributes, Restaurant.class);
+
+        attributes.forEach((key, value) -> {
+            Field field = ReflectionUtils.findField(Restaurant.class, key);
+            field.setAccessible(true);
+
+            Object newValue = ReflectionUtils.getField(field, updatedRestaurant);
+
+            ReflectionUtils.setField(field, entity, newValue);
+        });
     }
 }

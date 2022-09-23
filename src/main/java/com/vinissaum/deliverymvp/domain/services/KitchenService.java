@@ -2,6 +2,7 @@ package com.vinissaum.deliverymvp.domain.services;
 
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -30,8 +31,15 @@ public class KitchenService {
         return repository.insert(kitchen);
     }
 
-    public Kitchen update(Kitchen kitchen) {
-        return repository.update(kitchen);
+    public Kitchen update(Long id, Kitchen kitchen) {
+        Kitchen kitchenExists = repository.find(id);
+
+        if (kitchenExists == null) {
+            throw new ResourceNotFoundException(String.format("City id: %d not found", id));
+        }
+        BeanUtils.copyProperties(kitchen, kitchenExists, "id");
+
+        return repository.update(kitchenExists);
     }
 
     public void delete(Long id) {

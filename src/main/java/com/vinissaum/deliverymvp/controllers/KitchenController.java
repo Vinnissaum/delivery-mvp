@@ -3,7 +3,6 @@ package com.vinissaum.deliverymvp.controllers;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -56,12 +55,13 @@ public class KitchenController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Kitchen> update(@PathVariable Long id, @RequestBody Kitchen kitchen) {
-        Kitchen entity = service.find(id);
+        try {
+            Kitchen entity = service.update(id, kitchen);
 
-        BeanUtils.copyProperties(kitchen, entity, "id");
-        entity = service.update(entity);
-
-        return ResponseEntity.ok(entity);
+            return ResponseEntity.ok(entity);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")

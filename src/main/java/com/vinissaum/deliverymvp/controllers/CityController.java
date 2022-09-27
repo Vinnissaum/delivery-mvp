@@ -37,9 +37,12 @@ public class CityController {
 
     @GetMapping("/{id}")
     public ResponseEntity<City> show(@PathVariable Long id) {
-        City entity = service.find(id);
-
-        return ResponseEntity.ok(entity);
+        try {
+            City entity = service.find(id);
+            return ResponseEntity.ok(entity);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping

@@ -38,9 +38,12 @@ public class KitchenController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Kitchen> show(@PathVariable Long id) {
-        Kitchen entity = service.find(id);
-
-        return ResponseEntity.ok(entity);
+        try {
+            Kitchen entity = service.find(id);
+            return ResponseEntity.ok(entity);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping

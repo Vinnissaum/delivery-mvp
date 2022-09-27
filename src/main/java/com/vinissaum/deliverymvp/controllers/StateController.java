@@ -37,9 +37,12 @@ public class StateController {
 
     @GetMapping("/{id}")
     public ResponseEntity<State> show(@PathVariable Long id) {
-        State entity = service.find(id);
-
-        return ResponseEntity.ok(entity);
+        try {
+            State entity = service.find(id);
+            return ResponseEntity.ok(entity);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping

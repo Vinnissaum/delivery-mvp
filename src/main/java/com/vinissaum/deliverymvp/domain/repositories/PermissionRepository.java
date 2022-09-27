@@ -2,14 +2,8 @@ package com.vinissaum.deliverymvp.domain.repositories;
 
 import com.vinissaum.deliverymvp.domain.model.Permission;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface PermissionRepository {
-
-    List<Permission> findAll();
-    Permission find(Long id);
-    Permission insert(Permission permission);
-    Permission update(Permission permission);
-    void delete(Permission permission);
-
-}
+@Repository
+public interface PermissionRepository extends JpaRepository<Permission, Long> {}

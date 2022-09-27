@@ -2,14 +2,8 @@ package com.vinissaum.deliverymvp.domain.repositories;
 
 import com.vinissaum.deliverymvp.domain.model.PaymentType;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface PaymentTypeRepository {
-
-    List<PaymentType> findAll();
-    PaymentType find(Long id);
-    PaymentType insert(PaymentType paymentType);
-    PaymentType update(PaymentType paymentType);
-    void delete(PaymentType paymentType);
-
-}
+@Repository
+public interface PaymentTypeRepository extends JpaRepository<PaymentType, Long> {}

@@ -2,14 +2,8 @@ package com.vinissaum.deliverymvp.domain.repositories;
 
 import com.vinissaum.deliverymvp.domain.model.Restaurant;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface RestaurantRepository {
-
-    List<Restaurant> findAll();
-    Restaurant find(Long id);
-    Restaurant insert(Restaurant restaurant);
-    Restaurant update(Restaurant restaurant);
-    void delete(Long id);
-
-}
+@Repository
+public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {}

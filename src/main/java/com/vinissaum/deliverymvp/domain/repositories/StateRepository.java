@@ -2,14 +2,8 @@ package com.vinissaum.deliverymvp.domain.repositories;
 
 import com.vinissaum.deliverymvp.domain.model.State;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface StateRepository {
-
-    List<State> findAll();
-    State find(Long id);
-    State insert(State state);
-    State update(State state);
-    void delete(Long id);
-
-}
+@Repository
+public interface StateRepository  extends JpaRepository<State, Long> {}

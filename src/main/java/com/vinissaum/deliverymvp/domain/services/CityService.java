@@ -1,6 +1,7 @@
 package com.vinissaum.deliverymvp.domain.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import com.vinissaum.deliverymvp.domain.repositories.CityRepository;
 @Service
 public class CityService {
 
+    private static final String NOT_FOUND_MSG = "City id: %d not found";
+
     @Autowired
     private CityRepository repository;
 
@@ -24,29 +27,31 @@ public class CityService {
     }
 
     public City find(Long id) {
-        return repository.find(id);
+        Optional<City> entity = repository.findById(id);
+        return entity.orElseThrow(() -> new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id)));
     }
 
     public City insert(City city) {
-        return repository.insert(city);
+        return repository.save(city);
     }
 
     public City update(Long id, City city) {
-        City cityExists = repository.find(id);
+        Optional<City> entity = repository.findById(id);
 
-        if (cityExists == null) {
-            throw new ResourceNotFoundException(String.format("City id: %d not found", id));
+        if (entity.isEmpty()) {
+            throw new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id));
         }
-        BeanUtils.copyProperties(city, cityExists, "id");
 
-        return repository.update(cityExists);
+        BeanUtils.copyProperties(city, entity, "id");
+
+        return repository.save(entity.get());
     }
 
     public void delete(Long id) {
         try {
-            repository.delete(id);
+            repository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new ResourceNotFoundException(String.format("City id: %d not found", id));
+            throw new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id));
         }
         catch (DataIntegrityViolationException e) {
             throw new EntityInUseException(String.format("City id: %d can not be removed", id));

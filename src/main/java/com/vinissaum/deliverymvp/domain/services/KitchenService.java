@@ -1,6 +1,7 @@
 package com.vinissaum.deliverymvp.domain.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import com.vinissaum.deliverymvp.domain.repositories.KitchenRepository;
 @Service
 public class KitchenService {
 
+    private static final String NOT_FOUND_MSG = "Kitchen id: %d not found";
+
     @Autowired
     private KitchenRepository repository;
 
@@ -24,29 +27,31 @@ public class KitchenService {
     }
 
     public Kitchen find(Long id) {
-        return repository.find(id);
+        Optional<Kitchen> entity = repository.findById(id);
+
+        return entity.orElseThrow(() -> new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id)));
     }
 
     public Kitchen insert(Kitchen kitchen) {
-        return repository.insert(kitchen);
+        return repository.save(kitchen);
     }
 
     public Kitchen update(Long id, Kitchen kitchen) {
-        Kitchen kitchenExists = repository.find(id);
+        Optional<Kitchen> entity = repository.findById(id);
 
-        if (kitchenExists == null) {
-            throw new ResourceNotFoundException(String.format("City id: %d not found", id));
+        if (entity.isEmpty()) {
+            throw new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id));
         }
-        BeanUtils.copyProperties(kitchen, kitchenExists, "id");
+        BeanUtils.copyProperties(kitchen, entity, "id");
 
-        return repository.update(kitchenExists);
+        return repository.save(entity.get());
     }
 
     public void delete(Long id) {
         try {
-            repository.delete(id);
+            repository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new ResourceNotFoundException(String.format("Kitchen id: %d not found", id));
+            throw new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id));
         }
         catch (DataIntegrityViolationException e) {
             throw new EntityInUseException(String.format("Kitchen id: %d can not be removed", id));

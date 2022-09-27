@@ -3,6 +3,7 @@ package com.vinissaum.deliverymvp.domain.services;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import com.vinissaum.deliverymvp.domain.repositories.RestaurantRepository;
 @Service
 public class RestaurantService {
 
+    private static final String NOT_FOUND_MSG = "Restaurant id: %d not found";
+
     @Autowired
     private RestaurantRepository repository;
 
@@ -33,50 +36,51 @@ public class RestaurantService {
     }
 
     public Restaurant find(Long id) {
-        return repository.find(id);
+        Optional<Restaurant> entity = repository.findById(id);
+
+        return entity.orElseThrow(() -> new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id)));
     }
 
     public Restaurant insert(Restaurant restaurant) {
         Long kitchenId = restaurant.getKitchen().getId();
-        Kitchen kitchenExists = kitchenRespository.find(kitchenId);
+        Optional<Kitchen> entity = kitchenRespository.findById(kitchenId);
 
-        if (kitchenExists == null) {
+        if (entity.isEmpty()) {
             throw new ResourceNotFoundException(String.format("Kitchen id: %d not found", kitchenId));
         }
 
-        return repository.insert(restaurant);
+        return repository.save(restaurant);
     }
 
     public Restaurant update(Long id, Restaurant restaurant) {
-        Restaurant restaurantExists = repository.find(id);
+        Optional<Restaurant> entity = repository.findById(id);
 
-        if (restaurantExists == null) {
-            throw new ResourceNotFoundException(String.format("Restaurant id: %d not found", id));
+        if (entity.isEmpty()) {
+            throw new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id));
         }
-        BeanUtils.copyProperties(restaurant, restaurantExists, "id");
-
-        return repository.update(restaurantExists);
+        BeanUtils.copyProperties(restaurant, entity);
+        return repository.save(entity.get());
     }
 
     public Restaurant partialUpdate(Long id, Map<String, Object> attributesToUpdate) {
-        Restaurant restaurantExists = repository.find(id);
+        Optional<Restaurant> entity = repository.findById(id);
 
-        if (restaurantExists == null) {
-            throw new ResourceNotFoundException(String.format("Restaurant id: %d not found", id));
+        if (entity.isEmpty()) {
+            throw new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id));
         }
-        merge(restaurantExists, attributesToUpdate);
+        merge(entity.get(), attributesToUpdate);
 
-        return repository.update(restaurantExists);
+        return repository.save(entity.get());
     }
 
     public void delete(Long id) {
         try {
-            repository.delete(id);
+            repository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new ResourceNotFoundException(String.format("Kitchen id: %d not found", id));
+            throw new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id));
         }
         catch (DataIntegrityViolationException e) {
-            throw new EntityInUseException(String.format("Kitchen id: %d can not be removed", id));
+            throw new EntityInUseException(String.format("Restaurant id: %d can not be removed", id));
         }
     }
 

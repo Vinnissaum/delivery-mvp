@@ -1,14 +1,14 @@
 INSERT INTO kitchen (name) VALUES ('Tailandesa');
 INSERT INTO kitchen (name) VALUES ('Indiana');
 
-INSERT INTO restaurant (name, shipping_fee, kitchen_id) VALUES ('Indian foodtruck', 5.00, 2);
-INSERT INTO restaurant (name, shipping_fee, kitchen_id) VALUES ('Sasa Kamar gourmet', 7.00, 1);
-
 INSERT INTO state (name) VALUES ('MG');
 INSERT INTO state (name) VALUES ('RJ');
 
 INSERT INTO city (name, state_id) VALUES ('Sao Lourenco', 1);
 INSERT INTO city (name, state_id) VALUES ('Paraty', 2);
+
+INSERT INTO restaurant (name, shipping_fee, kitchen_id) VALUES ('Indian foodtruck', 5.00, 2);
+INSERT INTO restaurant (name, shipping_fee, kitchen_id, address_zip_code, address_district, address_street, address_number, address_complement, address_city) VALUES ('Sasa Kamar gourmet', 7.00, 1, "12222-222", "Sunset", "My Sunshine", "2806", "Ap: 2002", 1);
 
 INSERT INTO payment_type (description) VALUES ('credit card'), ('debit card'), ('money');
 

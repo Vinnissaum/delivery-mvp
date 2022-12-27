@@ -17,4 +17,7 @@ INSERT INTO payment_type (description) VALUES ('credit card'), ('debit card'), (
 
 INSERT INTO permission (name, description) VALUES ('admin', 'grant all permissions');
 
+INSERT INTO tb_group (name) VALUES ('FULL ACCESS')
+
+
 INSERT INTO restaurant_payment_type (restaurant_id, payment_type_id) VALUES (2, 1), (2, 2), (1, 3);

@@ -3,6 +3,9 @@ package com.vinissaum.deliverymvp.domain.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.vinissaum.deliverymvp.domain.exceptions.StateNotFoundException;
+import com.vinissaum.deliverymvp.domain.model.State;
+import com.vinissaum.deliverymvp.domain.repositories.StateRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,6 +25,9 @@ public class CityService {
     @Autowired
     private CityRepository repository;
 
+    @Autowired
+    private StateRepository stateRepository;
+
     public List<City> findAll() {
         return repository.findAll();
     }
@@ -36,15 +42,17 @@ public class CityService {
     }
 
     public City update(Long id, City city) {
-        Optional<City> entity = repository.findById(id);
+        Long stateId = city.getState().getId();
 
-        if (entity.isEmpty()) {
-            throw new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id));
-        }
+        City cityEntity = repository.findById(id).orElseThrow(() -> //
+            new ResourceNotFoundException(String.format(NOT_FOUND_MSG, id)));
+        BeanUtils.copyProperties(city, cityEntity, "id");
 
-        BeanUtils.copyProperties(city, entity, "id");
+        State state = stateRepository.findById(stateId).orElseThrow(() -> new StateNotFoundException(stateId));
 
-        return repository.save(entity.get());
+        cityEntity.setState(state);
+
+        return repository.save(cityEntity);
     }
 
     public void delete(Long id) {

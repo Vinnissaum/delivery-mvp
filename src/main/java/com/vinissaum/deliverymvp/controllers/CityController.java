@@ -3,6 +3,7 @@ package com.vinissaum.deliverymvp.controllers;
 import java.net.URI;
 import java.util.List;
 
+import com.vinissaum.deliverymvp.domain.exceptions.StateNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +38,8 @@ public class CityController {
 
     @GetMapping("/{id}")
     public ResponseEntity<City> show(@PathVariable Long id) {
-        try {
-            City entity = service.find(id);
-            return ResponseEntity.ok(entity);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        City entity = service.find(id);
+        return ResponseEntity.ok(entity);
     }
 
     @PostMapping
@@ -56,14 +53,10 @@ public class CityController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<City> update(@PathVariable Long id, @RequestBody City city) {
-        try {
-            City entity = service.update(id, city);
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody City city) {
+        City entity = service.update(id, city);
 
-            return ResponseEntity.ok(entity);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(entity);
     }
 
     @DeleteMapping("/{id}")
